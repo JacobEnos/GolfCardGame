@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfApp\bin\Release\net6.0\publish\SelfContained</_PublishTargetUrl>
+    <History>True|2024-08-30T23:06:20.7591879Z||;True|2024-08-30T18:56:45.9791986-04:00||;True|2024-08-30T13:43:30.6986358-04:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

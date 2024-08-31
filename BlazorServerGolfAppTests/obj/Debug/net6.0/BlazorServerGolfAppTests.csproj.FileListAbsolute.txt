@@ -1,0 +1,6 @@
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\bin\Debug\net6.0\CoverletSourceRootsMapping_BlazorServerGolfAppTests
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\obj\Debug\net6.0\BlazorServerGolfAppTests.csproj.AssemblyReference.cache
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\obj\Debug\net6.0\BlazorServerGolfAppTests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\obj\Debug\net6.0\BlazorServerGolfAppTests.AssemblyInfoInputs.cache
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\obj\Debug\net6.0\BlazorServerGolfAppTests.AssemblyInfo.cs
+C:\Users\Jacob\source\repos\BlazorServerGolfApp\BlazorServerGolfAppTests\obj\Debug\net6.0\BlazorServerGolfAppTests.csproj.CoreCompileInputs.cache
