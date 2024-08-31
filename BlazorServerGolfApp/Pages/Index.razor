@@ -1,0 +1,1251 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client;
+@using System.Text.Json;
+@inject NavigationManager NavManager;
+@implements IAsyncDisposable;
+@inject IJSRuntime JS;
+@using Microsoft.JSInterop;
+@using static BlazorServerGolfApp.ScoreBoard
+
+
+<style>
+    .coin{
+        color: chocolate;
+        font-size: 36px;
+        border: solid;
+        background-color: gold;
+    }
+ 
+    button:has(> div.playing-card), .deckCardButton {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        display:contents;
+        padding:0px;
+    }
+
+    .deckCard{
+        background-color: blue !important;
+    }
+
+    .playing-card {
+      /*width: 200px;
+      height: 300px;*/
+      min-width: 100px;
+      min-height: 200px;
+      max-width:40vw;
+      max-height: 30vh;
+      background-color: #fff;
+      border: 1px solid #000;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      position: relative;
+    }
+
+    .pic {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      height: auto;
+      margin: 5px;
+    }
+
+    .corner {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .corner *{
+      line-height: .8;
+    }
+
+    .top-left {
+      top: 10px;
+      left: 10px;
+    }
+
+    .bottom-right {
+      transform: rotate(180deg);
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .suit{
+      font-size: 48px;
+      order: 2;
+    }
+    
+    .rank {
+      font-size: 34px;
+      order: 1;
+    }
+
+    .spades, .clubs {
+      color: #000;
+    }
+
+    .diamonds, .hearts {
+      color: #f00;
+    }
+
+    .icon-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .icon {
+      font-size: 48px; /* Adjust as needed */
+      margin: 5px; /* Adjust as needed */
+    }
+
+    .icon-container > .icon{
+        font-size:12px;
+    }
+
+    .sidebar {
+        background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+        float: left;
+    }
+
+    .sidebar div{
+        color: white;
+    }
+
+    .top-row div{
+        color: white;
+    }
+
+    .felt {
+        background: linear-gradient(to bottom, #006400, #022b0c);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-blend-mode: multiply;
+        /*border-radius: 10px;*/
+    }
+
+    #popup{
+        border-radius: 10px;
+        border: thin solid;
+        box-shadow: 0px 0px 20px gray;
+    }
+
+    #scoreboard{
+        width: 600px;
+        border-collapse: collapse;
+    }
+
+    #scoreboard, th, td{
+        border: 1px solid;
+        padding: 5px;
+    }
+
+    #scoreboardWindow{
+        border-radius: 10px;
+    }
+
+
+    #btnDealCards{
+        border-radius: 20px 0px 0px 20px;
+        border: none;
+        box-shadow: 0px 0px 10px 1px;
+    }
+
+    #btnEndGame {
+        border-radius: 0px 20px 20px 0px;
+        border: none;
+        box-shadow: 0px 0px 10px 1px;
+    }
+
+    .activeCard {
+        box-shadow: 0px 0px 10px 5px yellow;
+        animation-name: highlightLoop;
+        animation-duration: 1s;
+        animation-direction: alternate;
+        animation-iteration-count: infinite;
+    }
+ 
+    @@keyframes highlightLoop {
+        from {
+            box-shadow: 0px 0px 5px 6px @(String.IsNullOrEmpty(finalFlipper) ? "palegoldenrod" : "red");
+        }
+        
+        to {
+            box-shadow: 0px 0px 20px 20px @(String.IsNullOrEmpty(finalFlipper) ? "gold" : "red");
+        }
+    }
+
+    #closeScoreboard{
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+
+    #chatWrapper{
+        /*border: 3px solid black;*/
+    }
+
+    #chatWindow{
+        max-height: 200px;
+        overflow-y: scroll;
+        border: 2px solid black;
+    }
+
+    #chatRow{
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+    }
+
+    .basicShadow{
+        box-shadow: 0px 0px 5px -2px black;
+    }
+
+    .handPreview{
+        position: absolute;
+        top: 220px;
+        z-index: 100;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 10px;
+        border: 2px solid black;
+        box-shadow: 0px 2px 20px 10px white;
+        background: linear-gradient(to bottom, #022b0c, #006400);
+        transform: translateX(-35%);
+    }
+
+    .handPreview .playing-card{
+        margin: 5px;
+        cursor: default;
+        min-width: 50px;
+        min-height: 100px;
+    }
+
+    .handWrapper{
+        position: relative;
+        animation-name: flyInFromLeft;
+        animation-duration: 2s;
+        animation-timing-function: ease-out;
+    }
+
+    @@keyframes flyInFromLeft {
+        from {
+            right: 100vw;
+        }
+
+        to {
+            right: 0vw;
+        }
+    }
+
+</style>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">   
+</head>
+<body>
+
+    
+
+    <div class="top-row row bg-secondary justify-content-between align-items-center">
+        
+        @if (String.IsNullOrWhiteSpace(MyName) || IsPlaying == "Watcher")
+        {
+            <div class="input-group m-2">
+                
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroupFileAddon01">Name:</span>
+                </div>
+
+                <input @bind="MyName" />
+            
+                <div class="input-group-append">
+                    <button class="btn btn-success" @onclick="Join">Join Game</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row align-items-center">
+                @if (playerAvatar != null) {
+                    <span style="font-size:5vh" class="pr-0">@playerAvatar</span>
+                }
+                <h1 class="m-0">
+                    @MyName <button @onclick="ResetGame">:</button> @IsPlaying
+                </h1>
+                @if (1 < Players.Count && TurnStage == GameState.TurnStages.InterRound && (roundNumber == null || roundNumber == 0 || roundNumber == 18))
+                {
+                    <button @onclick="StartGame" id="btnDealCards" class="btn-success" style="min-height:50px;">Deal Cards</button>
+                    <button @onclick="EndGame" id="btnEndGame" class="btn-danger" style="min-height:50px;">End Game</button>
+                }
+            </div>
+        }
+        <div style="float:right; display:@(roundNumber < 1 ? "none" : "inline")">
+            <button @onclick="() => showScoreboard(scoreboardHtml)">
+                <h3 class="m-0">
+                    Hand @(roundNumber)
+                </h3>
+            </button>
+        </div>
+    </div>
+
+    @if (Players != null && 1 < Players.Count) {
+        <div class="row bg-primary p-1">
+            <div class="row w-100 justify-content-around align-items-center">
+
+                <span class="oi oi-arrow-thick-left icon" style="display:@(TurnStage != GameState.TurnStages.InterRound ? "inline" : "none")"></span>
+                
+                
+                @foreach (Player player in new PlayerList(Players).GetPlayerQueue(ActivePlayer, TurnStage == GameState.TurnStages.Flipping, finalFlipper)  /*Players.Where(p => p.Name != ActivePlayer && p.IsPlaying)*/) {
+                    
+                    
+                    <div class="text-center" style="border: solid thin white" @onclick="() => ToggleHandPreview(player)">
+                        
+                        <h2 class="m-0">@player.Name</h2>
+                        <span style='font-size:50px;'>@player.Avatar</span>                    
+
+                        @if (player.Cards != null && player.Name != MyName && 0 < player.Cards.Count) {
+                     
+                            <div id="@(player.Name)HandPreview" class="handPreview" style="display:none">
+                                @foreach (List<Card> cardRow in player.Cards) {
+                                    <div class="row justify-content-around m-0">
+                                        @foreach (Card card in cardRow) {
+                                            //<button class="col" disabled>
+                                                @if (!card.isShowing) {
+                                                    <div class="playing-card deckCard"></div>
+                                                }
+                                                else {
+                                                    <div class="playing-card @card.Suite d-inline-flex">
+                                                        <span class="corner">
+                                                            <span class="rank">@card.Number</span>
+                                                            <span class="suit @card.Suite">@Card.icons[@card.Suite]</span>
+                                                        </span>
+                                                    </div>
+                                                }
+                                            //</button>
+                                        }
+                                    </div>
+                                    <div class="w-100"></div>//force newline
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                
+                
+                <span class="oi oi-arrow-thick-left icon" style="display:@(TurnStage != GameState.TurnStages.InterRound ? "inline" : "none")"></span>
+            </div>
+
+            <!--
+            @if (!String.IsNullOrEmpty(finalFlipper)) {
+                <h2>Last turn! @finalFlipper has flipped all</h2>
+            }
+            -->
+        </div>
+    }
+
+    @if (ActivePlayer != null && TurnStage != null && !flipOnly && TurnStage != GameState.TurnStages.InterRound){
+        /*
+        string turnText = "";
+        
+        if (TurnStage != null) {
+            if (ActivePlayer == MyName) {
+                turnText = "You're ";
+            }
+            else {
+                turnText = ActivePlayer + " is ";
+            }
+        }
+        
+        <h2>@turnText @(TurnStage == GameState.TurnStages.Drawing ? "choosing" : TurnStage)</h2>
+        */
+    }
+    else if (TurnStage == GameState.TurnStages.InterRound && !String.IsNullOrEmpty(MyName) && (Players.Where(p => p.Name == MyName).FirstOrDefault()?.Cards == null || Players.Where(p => p.Name == MyName).FirstOrDefault()?.Cards.Count == 0)) {
+        <h2>Ready, waiting for other players</h2>
+    }
+
+    <div class="felt row p-3 justify-content-around">
+
+        <button @onclick="Draw" disabled="@(ActivePlayer != MyName || TurnStage != GameState.TurnStages.Drawing)" class="col deckCardButton">
+            @*<img style="max-width:300px" src="https://www.pngfind.com/pngs/m/71-710462_card-back-hd-png-download.png" />*@
+            <div class="playing-card deckCard @(TurnStage == GameState.TurnStages.Drawing && ActivePlayer == MyName ? "activeCard" : "")">
+
+
+            </div>
+        </button>
+        
+
+        @if (!String.IsNullOrEmpty(ActivePlayer) && TurnStage != GameState.TurnStages.Flipping) {
+            <div class="text-center" style="border: solid thin white">
+                <span style='font-size:100px;'>@GetPlayer(ActivePlayer).Avatar</span>
+                <h2 class="m-0">@GetPlayer(ActivePlayer).Name</h2>
+            </div>
+        }
+
+
+        @if (TopDiscard != null)
+        {
+            <button @onclick="Pickup" disabled="@(ActivePlayer != MyName || TurnStage != GameState.TurnStages.Drawing || flipOnly)" class="col">
+                <div class="playing-card @TopDiscard.Suite my-auto @(CardDisabled(TopDiscard) ? "" : "activeCard")">
+                        
+                    <div class="pic justify-content-between">
+                        <div class="icon-container">
+                            @{
+                                int cardNumber = 0;
+                                Int32.TryParse(TopDiscard.Number, out cardNumber);
+                                if (cardNumber == 0) {
+                                    cardNumber = 10;   
+                                }
+                            }
+                            @for(int i=1; i<=cardNumber; i++){
+                                <span class="icon suit @TopDiscard.Suite">@Card.icons[@TopDiscard.Suite]</span>
+                            }
+                        </div>
+                    </div>
+                        
+                    <span class="corner top-left">
+                        <span class="rank">@TopDiscard.Number</span>
+                        <span class="suit @TopDiscard.Suite">@Card.icons[@TopDiscard.Suite]</span>
+                    </span>
+                        
+                    <span class="corner bottom-right">
+                        <span class="rank">@TopDiscard.Number</span>
+                        <span class="suit @TopDiscard.Suite">@Card.icons[@TopDiscard.Suite]</span>
+                    </span>
+                </div>
+            </button>
+        }
+    </div>
+
+    
+    @if (MyName != null && GetPlayer(MyName) != null && GetPlayer(MyName).Cards != null) {
+        <div class="col-12 bg-black handWrapper">
+            @foreach (List<Card> cardRow in Players.Where(p => p.Name == MyName).FirstOrDefault().Cards) {
+                <div class="row justify-content-around mt-3">
+                    @foreach (Card card in cardRow)
+                    {
+                        <button @onclick="() => CardAction(card)" disabled="@(CardDisabled(card))" 
+                        class="col">
+                            @if(!card.isShowing){
+                                <div class="playing-card deckCard @(CardDisabled(card) ? "" : "activeCard")"></div>
+                            }
+                            else{
+                                <div class="playing-card @card.Suite d-inline-flex @(CardDisabled(card) ? "" : "activeCard")">
+                                    <div class="pic justify-content-between">
+                                        <div class="icon-container">
+                                            @{
+                                                int cardNumber = 0;
+                                                Int32.TryParse(card.Number, out cardNumber);
+                                                if (cardNumber == 0) {
+                                                    cardNumber = 10;   
+                                                }
+                                            }
+                                            @for(int i=1; i<=cardNumber; i++){
+                                                <span class="icon suit @card.Suite">@Card.icons[@card.Suite]</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <span class="corner top-left">
+                                        <span class="rank">@card.Number</span>
+                                        <span class="suit @card.Suite">@Card.icons[@card.Suite]</span>
+                                    </span>
+                                    <span class="corner bottom-right">
+                                        <span class="rank">@card.Number</span>
+                                        <span class="suit @card.Suite">@Card.icons[@card.Suite]</span>
+                                    </span>
+                                </div>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div id="chatRow" class="row w-100 m-0">
+            <div id="chatWrapper" class="col-12 col-sm-5 col-xl-4 p-0">
+                <div id="chatBoxWrapper">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button id="btnChatToggle" class="input-group-text" @onclick="ToggleChat">Chat Toggle</button>
+                        </div>
+
+                        <input type="text" id="chatBox" class="form-control" placeholder="Chat to lobby:" @bind="ChatBox" />
+
+                        <div class="input-group-append">
+                            <button id="btnSendChat" class="btn btn-success" @onclick="SendChat">Send</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="chatWindow" class="pl-2 bg-secondary" style="display:none;" >
+                    @Chat
+                </div>
+            </div>
+            
+        </div>
+
+        
+    }
+
+    <dialog id="avatar-popup" data-modal class="pop-up text-center">
+        <h2>Choose Avatar</h2>
+        @foreach (string emojiString in avatarOptions) {
+            <button @onclick="() => AvatarSelected(emojiString)">
+                <span style='font-size:50px;'>@emojiString</span>
+            </button>
+        }
+    </dialog>
+
+
+    <dialog id="popup" data-modal class="pop-up">
+        @popUpText
+        <button @onclick="ReadyForNextRound" hidden="@gameOver" class="btn-success" style="clear: both">Next Round</button>
+        <button @onclick="ReadyForNextGame" hidden="@(!gameOver)" class="btn-warning" style="clear: both">Next Game</button>
+        <button @onclick="LeaveGame" hidden="@(!gameOver)" class="btn-danger" style="clear: both">Leave</button>
+    </dialog>
+
+    <dialog id="scoreboardWindow" data-modal class="scoreboard align-items-center">
+        <button id="closeScoreboard" class="btn-close btn-sm pr-0" style="display:@(TurnStage == GameState.TurnStages.InterRound ? "none":"inline")" @onclick="closeScoreboard"></button>
+        <div id="scoreboardWrapper"></div>
+        
+        <div class="row m-3 justify-content-between" style="display: @(TurnStage == GameState.TurnStages.InterRound ? "flex" : "none");">
+            <button @onclick="ReadyForNextRound" class="btn btn-success basicShadow" style="clear: both; ">Ready Up</button>
+            <button @onclick="LeaveGame"  class="btn btn-danger basicShadow" style="clear: both;">Leave Game</button>
+        </div>
+    </dialog>
+
+
+</body>
+
+
+
+
+@code {
+    private HubConnection? hubConnection;
+    private List<Player> Players = new();
+    private string? MyName;
+    private Card? TopDiscard;
+    private BlazorServerGolfApp.GameState.TurnStages? TurnStage;
+    private string? ActivePlayer;
+    private string IsPlaying = "Watcher";
+    private string? finalFlipper;
+    private bool hidePopUp = true;
+    private string popUpText;
+    private bool gameOver = false;
+    private bool flipOnly = true;
+    private int roundNumber = 0;
+    private string scoreboardHtml = "";
+    private int roundLimit = 18;
+    private string playerAvatar = null;
+    private bool showChat = false;
+    private string Chat = "";
+    private string ChatBox = null;
+    private string[] avatarOptions = new string[] {"🗻",
+"🗼",
+"🗽",
+"🗾",
+"🗿",
+"😀",
+"😁",
+"😂",
+"😃",
+"😄",
+"😅",
+"😆",
+"😇",
+"😈",
+"😉",
+"😊",
+"😋",
+"😌",
+"😍",
+"😎",
+"😏",
+"😐",
+"😑",
+"😒",
+"😓",
+"😔",
+"😕",
+"😖",
+"😗",
+"😘",
+"😙",
+"😚",
+"😛",
+"😜",
+"😝",
+"😞",
+"😟",
+"😠",
+"😡",
+"😢",
+"😣",
+"😤",
+"😥",
+"😦",
+"😧",
+"😨",
+"😩",
+"😪",
+"😫",
+"😬",
+"😭",
+"😮",
+"😯",
+"😰",
+"😱",
+"😲",
+"😳",
+"😴",
+"😵",
+"😶",
+"😷",
+"😸",
+"😹",
+"😺",
+"😻",
+"😼",
+"😽",
+"😾",
+"😿",
+"🙀",
+"🙁",
+"🙂",
+"🙃",
+"🙄",
+"🙅",
+"🙆",
+"🙇",
+"🙈",
+"🙉",
+"🙊",
+"🙋",
+"🙌",
+"🙍","🙎","🙏","🚀","🚁","🚂","🚃","🚄","🚅","🚆","🚇","🚈","🚉","🚊","🚋","🚌","🚍","🚎","🚏","🚐","🚑","🚒","🚓","🚔","🚕","🚖","🚗","🚘","🚙","🚚","🚛","🚜","🚝","🚞","🚟","🚠","🚡",
+"🚢"
+};
+
+    public async Task CloseAvatarDiag() => await JS.InvokeAsync<object>("closeAvatarDiag");
+    public async Task<string> ChooseAvatarPrompt() => await JS.InvokeAsync<string>("chooseAvatar");
+    public async Task<string> ToggleChat() => await JS.InvokeAsync<string>("toggleChat");
+    public async Task<string> AddChat(string textToAdd) => await JS.InvokeAsync<string>("addChat", textToAdd);
+    public async Task<string> ToggleHandPreview(Player player) => await JS.InvokeAsync<string>("toggleHandPreview", $"{player.Name}HandPreview");
+
+
+
+    public bool CardDisabled(Card card) {
+
+        //If its not my turn
+        if (TurnStage != GameState.TurnStages.Flipping && ActivePlayer != MyName) {
+            return true;
+        }
+
+        if (card == TopDiscard) {
+            if (TurnStage != GameState.TurnStages.Drawing || ActivePlayer != MyName) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        switch (TurnStage) {
+            case GameState.TurnStages.InterRound:
+                return true;
+            case GameState.TurnStages.Flipping:
+                if (2 <= new CardHand(GetPlayer(MyName).Cards).CountFlipped()) {
+                    return true;
+                }
+                else {
+                    return card.isShowing;
+                }
+                break;
+            case GameState.TurnStages.Drawing:
+                if (card != TopDiscard && card.isShowing) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            case GameState.TurnStages.Discarding:
+                return false;
+        }
+
+        return true;
+    }
+
+
+    public async Task AvatarSelected(string emoji) {
+        var avatar = System.Web.HttpUtility.UrlDecode(emoji);
+        playerAvatar = avatar;
+        Players.Where(p => p.Name == MyName).FirstOrDefault().Avatar = emoji;
+        CloseAvatarDiag();
+        if (hubConnection is not null) {
+            await hubConnection.SendAsync("AvatarChosen", MyName, playerAvatar);
+        }
+        return;
+    }
+
+    private void ResetGame() {
+        if (hubConnection is not null) {
+            hubConnection.SendAsync("ResetGame");
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavManager.ToAbsoluteUri("/golf"))
+            .WithAutomaticReconnect()
+            .Build();
+
+
+        hubConnection.On<List<Player>>("YouJoined", (playerList) =>
+        {
+            Players = playerList;
+            TurnStage = GameState.TurnStages.InterRound;
+            InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<Player>("PlayerJoined", (joiner) =>
+        {
+            TurnStage = GameState.TurnStages.InterRound;
+            Players.Add(joiner);
+            JS.InvokeVoidAsync("alert", joiner.Name + " has joined the game");
+            InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<Player>("PlayerAltered", (altered) => {
+            int? index = GetPlayerIndex(altered.Name);
+            if (index == null){
+                throw new NotImplementedException();
+            }
+            else {
+                Players[(int)index] = altered;    
+            }
+
+
+            JS.InvokeVoidAsync("alert", altered.Name + " has been changed");
+            InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string, string>("PlayerChoseAvatar", (playerName, playerAvatar) => {
+
+            Players.Where(p => p.Name == playerName).FirstOrDefault().Avatar = playerAvatar;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        hubConnection.On<string, string>("SendChat", (playerName, message) => {
+            if (!String.IsNullOrEmpty(Chat)) {
+                //Chat += "<br>";
+            }
+            //Chat += $"{playerName}: {message}";
+            AddChat($"{playerName}: {message}");
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        hubConnection.On("FullReset", () => {
+            //hubConnection = null;
+            Players = new();
+            MyName = null;
+            TopDiscard = null;
+            TurnStage = null;
+            ActivePlayer = null;
+            IsPlaying = "Watcher";
+            finalFlipper = null;
+            hidePopUp = true;
+            popUpText = null;
+            gameOver = false;
+            flipOnly = true;
+            roundNumber = 0;
+            scoreboardHtml = "";
+            roundLimit = 18;
+            playerAvatar = null;
+
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        hubConnection.On<string, int>("Deal", (dealeeName, rowIndex) =>
+        {
+            Console.WriteLine($"Received deal for connection ID: {hubConnection.ConnectionId}");
+            Player dealee = GetPlayer(dealeeName);
+
+            if (dealee == null){
+                throw new NotImplementedException("Deal() doesnt find player by name");
+            }
+            if(dealee.Cards == null) {
+                dealee.Cards = new();
+            }
+            if(dealee.Cards.Count < 1) {
+                dealee.Cards.Add(new());
+                dealee.Cards.Add(new());
+            }
+            dealee.Cards[rowIndex].Add(new Card());
+
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<string>("BeginGame", (topDiscard) =>
+        {
+            finalFlipper = null;
+            TurnStage = GameState.TurnStages.Flipping;
+            TopDiscard = new Card(topDiscard);
+            roundNumber = 1;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On("BeginRound", () => {
+            finalFlipper = null;
+            flipOnly = false;
+            TurnStage = GameState.TurnStages.Drawing;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        hubConnection.On<string>("TopDiscard", (topDiscard) => {
+            TopDiscard = new Card(topDiscard);
+            roundNumber++;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<string>("NewTurn", (newActivePlayerName) =>
+        {
+            ActivePlayer = newActivePlayerName;
+            TurnStage = GameState.TurnStages.Drawing;
+            if (ActivePlayer == MyName) {
+                throw new NotImplementedException("NewTurn Enable my cards for my turn");
+            }
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<string, bool, string>("ChooseCard", (chooseeName, fromDiscard, card) => {
+            Card drawn = new Card(card);
+            Player choosee = GetPlayer(chooseeName);
+            choosee.Cards.Add(new List<Card>()); //Add drawn to a third row, to be deleted on discard
+            choosee.Cards.Last().Add(drawn);
+
+            if (fromDiscard) {
+                TopDiscard = new();
+            }
+
+            TurnStage = GameState.TurnStages.Discarding;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+
+        hubConnection.On<string>("FlipDeal", (startingPlayerName) => {
+
+            flipOnly = true;
+            ActivePlayer = startingPlayerName;
+            TurnStage = GameState.TurnStages.Flipping;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+
+
+        hubConnection.On<string, Card, Tuple<int, int>>("PlayerFlipped", (flipperName, card, indices) => {
+
+            Player flipper = GetPlayer(flipperName);
+            flipper.Cards[indices.Item1][indices.Item2] = card;
+
+            if (flipperName == MyName && TurnStage == null) {
+
+                int flippedCount = 0;
+                //count flipped
+                foreach (List<Card> cardRow in flipper.Cards) {
+                    foreach(Card c in cardRow) {
+                        if (c.isShowing) {
+                            flippedCount++;
+                        }
+                    }
+                }
+
+                if (2 <= flippedCount) {
+                    flipOnly = false;
+                }
+            }
+
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        hubConnection.On<string, Card, Tuple<int, int>>("Discard", (discarderName, discardedCard, indices) => {
+            Player discarder = GetPlayer(discarderName);
+
+            discarder.Cards[indices.Item1][indices.Item2] = discarder.Cards[0][0]; //Assign drawn in pre-pended row
+            discarder.Cards.RemoveAt(0);    //Remove pre-pended row
+            TopDiscard = discardedCard;
+
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<List<KeyValuePair<string, List<List<Card>>>>>("FlipAll", (playerHands) => {
+
+            foreach(KeyValuePair<string, List<List<Card>>> playerHand in playerHands) {
+                GetPlayer(playerHand.Key).Cards = playerHand.Value;
+            }
+            finalFlipper = ActivePlayer;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<Card, Card>("Pickup", (card, newDiscard) => {
+            Player player = GetPlayer(ActivePlayer);
+
+            player.Cards.Insert(0, new List<Card>{card}); //Assign drawn in 3rd row
+            TopDiscard = newDiscard;
+            TurnStage = GameState.TurnStages.Discarding;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+
+
+
+
+        hubConnection.On<Card>("Draw", (card) => {
+            Player player = GetPlayer(ActivePlayer);
+
+            player.Cards.Insert(0, new List<Card> { card }); //Assign drawn in 3rd row
+            TurnStage = GameState.TurnStages.Discarding;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<int>("ResetPoints", (maxLives) => {
+            ResetPoints();
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<string>("ShowScoreboard", (scoreboardJson) => {
+
+            List<ScoreBoardRow> scores = JsonSerializer.Deserialize<List<ScoreBoardRow>>(scoreboardJson);
+
+            string htmlScoreboard = ListToHTMLTableString(scores);
+            //popUpText = htmlScoreboard;
+            scoreboardHtml = htmlScoreboard;
+            //Show pop-up
+            //JS.InvokeAsync<object>("showDiag");
+            TurnStage = GameState.TurnStages.InterRound;
+            showScoreboard(htmlScoreboard);
+            InvokeAsync(StateHasChanged);
+
+            ScoreBoardRow winner = scores.MinBy(myRow => myRow.roundPoints);            
+            //alert($"{winner.playerName} won that round with {winner.roundPoints}!");
+        });
+
+
+
+        hubConnection.On<string>("NewPlayersTurn", (nextPlayer) =>
+        {
+            TurnStage = GameState.TurnStages.Drawing;
+            ActivePlayer = nextPlayer;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+
+        hubConnection.On<string>("RoundOver", (pScoreboard) => {
+
+            popUpText = "<table><th><td>Round Points</td><td>Player Name</td><td>Total Points</td></th>";
+            List<List<string>> scoreboard = JsonSerializer.Deserialize<List<List<string>>>(pScoreboard);
+            string scoreboardHTML = "";
+            foreach (List<string> playerStats in scoreboard) {
+                scoreboardHTML += $"<tr><td>{playerStats[0]}</td><td>{playerStats[1]}</td><td>{playerStats[2]}</td></tr>";
+            }
+            scoreboardHTML += $"</table>"; //Close the table
+            popUpText += scoreboardHTML;
+
+            InvokeAsync(StateHasChanged);
+            JS.InvokeAsync<object>("showDiag");
+            //InvokeAsync(StateHasChanged);
+        });
+
+        //hubConnection.On<string>("NewRound", (losers) => {
+        //    List<string> loserNames = losers.Split(",").ToList();
+        //    popUpText = losers + " lost that round!";
+
+        //    if (loserNames.Contains(PlayerName)) {
+        //        myLives--;
+        //        if (knocked == PlayerName) {
+        //            myLives--;
+        //        }
+        //    }
+
+        //    InvokeAsync(StateHasChanged);
+        //    JS.InvokeAsync<object>("showDiag");
+        //    //InvokeAsync(StateHasChanged);
+        //});
+
+        hubConnection.On<string>("PlayerWon", (winner) => {
+            gameOver = true;
+            popUpText = winner + " won the game!";
+
+            InvokeAsync(StateHasChanged);
+            JS.InvokeAsync<object>("showDiag");
+            //InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private void FlipAll() => GetPlayer(MyName).Cards.ForEach(cl => cl.ForEach(card => card.isShowing = true));
+
+    public async Task showScoreboard(string html) => await JS.InvokeAsync<object>("showScoreboard", html);
+    public async Task alert(string message) => await JS.InvokeAsync<object>("alert", message);
+
+    private void DialogButton() {
+        hidePopUp = true;
+    }
+
+
+    private Tuple<int, int> GetCardIndices(Card card) {
+        Player player = GetPlayer(MyName);
+
+        int rowIndex = player.Cards.IndexOf(
+            player.Cards.Where(cl => cl.Contains(card)).FirstOrDefault()
+        );
+
+        int columnIndex = GetPlayer(MyName).Cards[rowIndex].IndexOf(card);
+        return new Tuple<int, int>(rowIndex, columnIndex);
+    }
+
+
+    private void CardAction(Card card) {
+        Tuple<int, int> indices = GetCardIndices(card);
+
+        if (TurnStage == GameState.TurnStages.Flipping || TurnStage == GameState.TurnStages.Drawing) {
+            //Fetch Card from hub (no cheating!)
+            Flip(indices);
+        }
+        else if(TurnStage == GameState.TurnStages.Discarding){
+            //Discard
+            Discard(indices);
+        }
+        else {
+            throw new Exception("Unexpected call to client's CardAction()");
+        }
+    }
+
+
+    public async Task Flip(Tuple<int, int> indices) {
+        if (hubConnection != null) {
+            await hubConnection.SendAsync("FlipCard", MyName, indices);
+        }
+    }
+
+
+    private string ListToHTMLTableString(List<ScoreBoardRow> list) {
+
+        string htmlTable = @"
+        <table class='scoreboard'>
+            <thead>
+                <tr>
+                    <th>Round Points</th>
+                    <th>Name</th>
+                    <th>Total Points</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+        foreach(ScoreBoardRow player in list) {
+            string tableRow = $"<tr><td>{player.roundPoints}</td><td>{player.playerName}</td><td>{player.totalPoints}</td></tr>";
+            htmlTable += tableRow;
+        }
+
+        htmlTable += "</tbody></table>";
+        return htmlTable;
+    }
+
+    private int? GetPlayerIndex(string playerName) {
+        for(int i=0; i<Players.Count(); i++) {
+            if (Players[i].Name == playerName) return i;
+        }
+        return null;
+    }
+
+    private Player? GetPlayer(string playerName) {
+        for (int i = 0; i < Players.Count(); i++) {
+            if (Players[i].Name == playerName) return Players[i];
+        }
+        return null;
+    }
+
+    private void ResetPoints() => Players.ForEach(p => p.Points = 0);
+    public async Task loseLife(string text) => await JS.InvokeAsync<object>("loseLife", text);
+    public async Task closeDiag() => await JS.InvokeAsync<object>("closeDiag");
+    public async Task closeScoreboard() => await JS.InvokeAsync<object>("closeScoreboard");
+
+
+
+
+    private async Task Join(){
+
+        if(hubConnection is not null)
+        {
+            ChooseAvatarPrompt();
+            Players.Add(new Player(MyName));
+            await hubConnection.SendAsync("AddPlayer", MyName, true);
+            IsPlaying = "Playing";
+        } 
+    }
+
+    public async Task StartGame()
+    {
+        if(hubConnection != null)
+        {
+            await hubConnection.SendAsync("StartGame");
+        }
+    }
+
+    public async Task Test() {
+        if (hubConnection != null) {
+            await hubConnection.SendAsync("Test");
+        }
+    }
+
+    public async void Draw(){
+
+        if(hubConnection != null)
+        {
+            await hubConnection.SendAsync("Draw");
+        }
+    }
+
+    private async void Discard(Tuple<int, int> indices)
+    {
+
+        if (hubConnection != null)
+        {
+            /*
+            var myCards = GetPlayer(MyName).Cards;
+
+            //if not discrading the picked-up card
+            if (indices.Item1 != 0) {
+                //Insert the drawn card where discarding from
+                myCards[indices.Item1][indices.Item2] = myCards[0][0];
+            }
+            */
+            await hubConnection.SendAsync("Discard", indices);
+        }
+    }
+
+    private async Task Draw(string discarded)
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("Draw");
+        }
+    }
+
+
+    private async Task Pickup()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("Pickup");
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+
+    private async void ReadyForNextRound() {
+        if (hubConnection != null) {
+
+            finalFlipper = null;
+            ActivePlayer = null;
+            Players.Where(p => p.Name == MyName).FirstOrDefault().Cards = new();
+            Players.ForEach(p => p.Cards = new());
+            TopDiscard = null;
+            closeDiag();
+            closeScoreboard();
+            await hubConnection.SendAsync("PlayerReady", MyName);
+
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+
+    private async void ReadyForNextGame() {
+        if (hubConnection != null) {
+
+            Players.ForEach(p => p.Cards = new());
+            finalFlipper = null;
+            ActivePlayer = null;
+
+            await hubConnection.SendAsync("PlayerReady", MyName);
+
+            closeDiag();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async void LeaveGame() {
+        if (hubConnection != null) {
+
+            await hubConnection.SendAsync("LeaveGame", MyName);
+            IsPlaying = "Watcher";
+
+            closeDiag();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task EndGame()
+    {
+
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("EndGame");
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+            await hubConnection.DisposeAsync();
+    }
+
+    public async Task SendChat() {
+        if (hubConnection != null){
+            await hubConnection.SendAsync("SendChat", MyName, ChatBox);
+            ChatBox = null;
+        }
+    }
+    
+}

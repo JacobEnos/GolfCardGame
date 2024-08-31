@@ -1,0 +1,15 @@
+﻿@page "/"
+@namespace BlazorServerGolfApp.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="ServerPrerendered" />
+
+<script>
+    function alert(message) {
+        window.alert(message);
+        return;
+    }
+</script>

@@ -1,0 +1,142 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\pages\\index.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\pages\\index.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\wwwroot\\javascript.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\wwwroot\\javascript.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\playerlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\playerlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\hubs\\golfhub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\hubs\\golfhub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|c:\\users\\jacob\\source\\repos\\blazorservergolfapp\\blazorservergolfapp\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{E725BA78-EEBA-4F5B-B3BA-0EC33781EA8C}|BlazorServerGolfApp\\BlazorServerGolfApp.csproj|solutionrelative:blazorservergolfapp\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 409,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Player.cs",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Player.cs",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\Player.cs",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Player.cs",
+              "RelativeToolTip": "BlazorServerGolfApp\\Player.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-31T00:10:36.701Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "BlazorServerGolfApp\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-08-30T02:12:16.838Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Card.cs",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Card.cs",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\Card.cs",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Card.cs",
+              "RelativeToolTip": "BlazorServerGolfApp\\Card.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-30T02:11:48.296Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.razor",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Pages\\Index.razor",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\Pages\\Index.razor",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Pages\\Index.razor",
+              "RelativeToolTip": "BlazorServerGolfApp\\Pages\\Index.razor",
+              "ViewState": "AgIAAJQBAAAAAAAAAAAwwKEBAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-29T23:17:50.394Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 329,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PlayerList.cs",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\PlayerList.cs",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\PlayerList.cs",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\PlayerList.cs",
+              "RelativeToolTip": "BlazorServerGolfApp\\PlayerList.cs",
+              "ViewState": "AgIAAEwAAAAAAAAAAAASwGkAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-30T01:22:10.509Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GolfHub.cs",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Hubs\\GolfHub.cs",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\Hubs\\GolfHub.cs",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\Hubs\\GolfHub.cs",
+              "RelativeToolTip": "BlazorServerGolfApp\\Hubs\\GolfHub.cs",
+              "ViewState": "AgIAADcBAAAAAAAAAAAQwF0BAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-30T00:14:19.995Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "JavaScript.js",
+              "DocumentMoniker": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\wwwroot\\JavaScript.js",
+              "RelativeDocumentMoniker": "BlazorServerGolfApp\\wwwroot\\JavaScript.js",
+              "ToolTip": "C:\\Users\\Jacob\\source\\repos\\BlazorServerGolfApp\\BlazorServerGolfApp\\wwwroot\\JavaScript.js",
+              "RelativeToolTip": "BlazorServerGolfApp\\wwwroot\\JavaScript.js",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAkwFMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2024-08-30T00:56:32.293Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
